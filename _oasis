@@ -1,0 +1,24 @@
+OASISFormat:  0.4
+OCamlVersion: >= 4.02.3
+Name:         brozip
+Version:      0.1
+Maintainers:  Edgar Aroutiounian
+Homepage:     http://hyegar.com
+Synopsis:     Command line tool to compress, decompress files using the Brotli algorithm
+Authors:      Edgar Aroutiounian <edgar.factorial@gmail.com>
+License:      BSD-3-clause
+Plugins:      META (0.4), DevFiles (0.4)
+AlphaFeatures: ocamlbuild_more_args
+
+Description:
+  brozip is a command line tool to compress and decompress
+  files using the Brotli algorithm with OCaml bindings to the
+  Google Brotli library.
+
+Executable brozip
+  Path: src
+  BuildTools:ocamlbuild
+  install: true
+  MainIs: main.ml
+  CompiledObject: native
+  BuildDepends: cmdliner, brotli, lwt.unix, lwt.ppx
