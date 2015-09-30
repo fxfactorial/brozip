@@ -28,14 +28,14 @@ let lgwin_level =
   Arg.(value & opt int 22 & info ["w"; "lgwin"] ~doc)
 
 let mode =
-  let doc = "Mode to use. Can be $(b,generic), $(b,text) assuming UTF-8 \
+  let doc = "Mode to use. Can be $(b,generic), $(b,text) assuming UTF-8, \
              or $(b,font) assuming WOFF 2.0"
   in
   Arg.(value & opt string "generic" & info ["m"; "mode"] ~doc)
 
 let suffix =
   let doc = "What suffix to use on outputted files" in
-  Arg.(value & opt string "" & info ["S"; "suffix"] ~doc)
+  Arg.(value & opt string "bro" & info ["S"; "suffix"] ~doc)
 
 let lgblock_level =
   let doc = "Base 2 logarithm of the maximum input block size. \
@@ -48,13 +48,14 @@ let dest_directory =
   let doc = "What directory to output files to, defaults to \
              this current directory"
   in
-  Arg.(value & opt string "" & info ["d"; "directory"] ~doc)
+  Arg.(value & opt string "." & info ["d"; "directory"] ~doc)
 
 let files =
   let doc = "Input files" in
   Arg.(value & pos_all file [] & info [] ~doc )
 
-let handle_decompression (files, no_con, suffix, dest_directory) = match no_con with
+let handle_decompression (files, no_con, suffix, dest_directory) =
+  Lwt_unix.chdir dest_directory >>= fun () -> match no_con with
   | false ->
     (* This is the default case *)
     files |> Lwt_list.iter_p Decompress.to_path
@@ -76,6 +77,49 @@ let verify_params mode quality lgwin_level lgblock_level =
    | 0 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 -> ()
    | _ -> raise (Bad_parameter "lgblock_level must be either 0 or \
                                 a value in 16 to 24 range "))
+
+(* TODO Must be a smarter way, isn't there subtyping with polyvariants ? *)
+let v_q = function
+  | 0 -> `_0 | 1 -> `_1 | 2 -> `_2 | 3 -> `_3 | 4 -> `_4
+  | 5 -> `_5 | 6 -> `_6 | 7 -> `_7 | 8 -> `_8 | 9 -> `_9
+  | _ -> assert false
+
+let v_w = function
+  | 10 -> `_10 | 11 -> `_11 | 12 -> `_12 | 13 -> `_13
+  | 14 -> `_14 | 15 -> `_15 | 16 -> `_16 | 17 -> `_17
+  | 18 -> `_18 | 19 -> `_19 | 20 -> `_20 | 21 -> `_21
+  | 22 -> `_22 | 23 -> `_23 | 24 -> `_24 | _ -> assert false
+
+let v_b = function
+  | 0 -> `_0 |16 -> `_16 | 17 -> `_17 | 18 -> `_18
+  | 19 -> `_19 | 20 -> `_20 | 21 -> `_21
+  | 22 -> `_22 | 23 -> `_23 | 24 -> `_24
+  | _ -> assert false
+
+let m_to_mode = function
+  | "mode" -> Compress.Generic
+  | "text" -> Compress.Text
+  | "font" -> Compress.Font
+  | _ -> assert false
+
+let handle_compression
+    (files, no_con, suffix, dest_directory)
+    (mode, quality, lgwin_level, lgblock_level) =
+  let (mode, quality, lgwin, lgblock) =
+    m_to_mode mode, v_q quality, v_w lgwin_level, v_b lgblock_level
+  in
+  Lwt_unix.chdir dest_directory >>= fun () -> match no_con with
+  | false ->
+    (* This is the default case *)
+    files |> Lwt_list.iter_p begin fun a_file ->
+      (a_file ^ suffix)
+      |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
+    end
+  | true ->
+    files |> Lwt_list.iter_s begin fun a_file ->
+      (a_file ^ suffix)
+      |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
+    end
 
 let begin_program
     do_compress
@@ -120,11 +164,8 @@ let top_level_info =
                  file will be replaced with another file with the suffix, set by \
                  the $(b,-S) suffix option, added, if possible";
              `P "In decompression mode, each file will be checked for \
-                 existence, as will the file with the suffix added. \
-                 Each file argument must contain a separate complete \
-                 archive; when multiple files are indicated, \
-                 each is decompressed in turn.";
-             `P "$(b,$(tname)) exposes comression compression options but \
+                 existence, as will the file with the suffix added";
+             `P "$(b,$(tname)) exposes compression options and \
                  defaults to values used by Google";
              `S "AUTHOR";
              `P "brozip was written by Edgar Aroutiounian";
