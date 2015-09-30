@@ -25,6 +25,12 @@ let lgwin_level =
   in
   Arg.(value & opt int 16 & info ["w"; "lgwin"] ~doc)
 
+let mode =
+  let doc = "Mode to use. Can be generic, text assuming UTF-8 \
+             or font assuming WOFF 2.0"
+  in
+  Arg.(value & opt string "generic" & info ["m"; "mode"] ~doc)
+
 let suffix =
   let doc = "What suffix to use on outputted files" in
   Arg.(value & opt string "" & info ["S"; "suffix"] ~doc)
@@ -46,22 +52,26 @@ let files =
   let doc = "Input files" in
   Arg.(value & pos_all file [] & info [] ~doc )
 
+
 let chorus
     do_compress
     quality
+    mode
     no_concurrency_on
     suffix
     dest_directory
     lgwin_level
     lgblock_level
     files =
-  ()
+
+  return ()
 
 let entry_point =
   Term.(pure
          chorus
         $ do_compress
         $ quality_level
+        $ mode
         $ no_concurrency_on
         $ suffix
         $ dest_directory
@@ -99,8 +109,8 @@ let top_level_info =
 
 let brozip =
   (match Term.eval (entry_point, top_level_info) with
-   | `Ok _ -> ()
-   | `Error _ -> ()
+   | `Ok a -> ()
+   | `Error e -> ()
    | _ -> ())
   |> return
 
