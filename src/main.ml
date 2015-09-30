@@ -55,12 +55,15 @@ let files =
   Arg.(value & pos_all file [] & info [] ~doc )
 
 let handle_decompression (files, no_con, suffix, dest_directory) =
-  Lwt_unix.chdir dest_directory >>= fun () -> match no_con with
+  Lwt_unix.chdir dest_directory >>= fun () -> match files with
+  | [] ->
+    Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= (Lwt_io.write Lwt_io.stdout)
+  | some_files -> match no_con with
   | false ->
     (* This is the default case *)
-    files |> Lwt_list.iter_p Decompress.to_path
+    some_files |> Lwt_list.iter_p Decompress.to_path
   | true ->
-    files |> Lwt_list.iter_s Decompress.to_path
+    some_files |> Lwt_list.iter_s Decompress.to_path
 
 let verify_params mode quality lgwin_level lgblock_level =
   (match String.lowercase mode with
@@ -108,15 +111,17 @@ let handle_compression
   let (mode, quality, lgwin, lgblock) =
     m_to_mode mode, v_q quality, v_w lgwin_level, v_b lgblock_level
   in
-  Lwt_unix.chdir dest_directory >>= fun () -> match no_con with
+  Lwt_unix.chdir dest_directory >>= fun () -> match files with
+  | [] -> return ()
+  | some_files -> match no_con with
   | false ->
     (* This is the default case *)
-    files |> Lwt_list.iter_p begin fun a_file ->
+    some_files |> Lwt_list.iter_p begin fun a_file ->
       (a_file ^ suffix)
       |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
     end
   | true ->
-    files |> Lwt_list.iter_s begin fun a_file ->
+    some_files |> Lwt_list.iter_s begin fun a_file ->
       (a_file ^ suffix)
       |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
     end
