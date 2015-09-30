@@ -133,10 +133,13 @@ let begin_program
     files =
   Lwt_main.run begin
     verify_params mode quality lgwin_level lgblock_level;
-    if do_compress then begin
-      return ()
-    end
-    else handle_decompression (files, no_concurrency_on, suffix, dest_directory)
+    match do_compress with
+    | true ->
+      handle_compression
+        (files, no_concurrency_on, suffix, dest_directory)
+        (mode, quality, lgwin_level, lgblock_level)
+    | false ->
+      handle_decompression (files, no_concurrency_on, suffix, dest_directory)
   end
 
 let entry_point =
