@@ -1,0 +1,4 @@
+Command line tool to compress, decompress files using the Brotli algorithm
+brozip is a command line tool to compress and decompress files using
+the Brotli algorithm and OCaml bindings to the Google Brotli library.
+
