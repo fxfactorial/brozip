@@ -57,7 +57,7 @@ let files =
 let handle_decompression (files, no_con, suffix, dest_directory) =
   Lwt_unix.chdir dest_directory >>= fun () -> match files with
   | [] ->
-    Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= (Lwt_io.write Lwt_io.stdout)
+    Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
   | false ->
     (* This is the default case *)
@@ -112,7 +112,8 @@ let handle_compression
     m_to_mode mode, v_q quality, v_w lgwin_level, v_b lgblock_level
   in
   Lwt_unix.chdir dest_directory >>= fun () -> match files with
-  | [] -> return ()
+  | [] ->
+    Lwt_io.read Lwt_io.stdin >>= Compress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
   | false ->
     (* This is the default case *)
@@ -190,6 +191,5 @@ let top_level_info =
 let () =
   match Term.eval (entry_point, top_level_info) with
   | `Ok a -> ()
-  | `Error `Exn ->
-    print_endline "was exception"
+  | `Error _ -> prerr_endline "Some kind of error"
   | _ -> ()
