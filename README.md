@@ -10,6 +10,8 @@ Until I get this up on `opam` you will have to locally pin the
 package, do that with:
 
 ```shell
+$ git clone https://github.com/fxfactorial/brozip
+$ cd brozip
 $ opam pin add brozip . -y
 ```
 
