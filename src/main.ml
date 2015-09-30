@@ -59,11 +59,11 @@ let handle_decompression (files, no_con, suffix, dest_directory) =
   | [] ->
     Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
-  | false ->
-    (* This is the default case *)
-    some_files |> Lwt_list.iter_p Decompress.to_path
-  | true ->
-    some_files |> Lwt_list.iter_s Decompress.to_path
+    | false ->
+      (* This is the default case *)
+      some_files |> Lwt_list.iter_p Decompress.to_path
+    | true ->
+      some_files |> Lwt_list.iter_s Decompress.to_path
 
 let verify_params mode quality lgwin_level lgblock_level =
   (match String.lowercase mode with
@@ -115,17 +115,17 @@ let handle_compression
   | [] ->
     Lwt_io.read Lwt_io.stdin >>= Compress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
-  | false ->
-    (* This is the default case *)
-    some_files |> Lwt_list.iter_p begin fun a_file ->
-      (a_file ^ suffix)
-      |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
-    end
-  | true ->
-    some_files |> Lwt_list.iter_s begin fun a_file ->
-      (a_file ^ suffix)
-      |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
-    end
+    | false ->
+      (* This is the default case *)
+      some_files |> Lwt_list.iter_p begin fun a_file ->
+        (a_file ^ suffix)
+        |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
+      end
+    | true ->
+      some_files |> Lwt_list.iter_s begin fun a_file ->
+        (a_file ^ suffix)
+        |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
+      end
 
 let begin_program
     do_compress
@@ -150,7 +150,7 @@ let begin_program
 
 let entry_point =
   Term.(pure
-         begin_program
+          begin_program
         $ do_compress
         $ quality_level
         $ mode
