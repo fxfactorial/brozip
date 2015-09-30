@@ -3,6 +3,7 @@ open Lwt
 open Brotli
 
 type exn += Bad_parameter of string
+type exn += Bad_input of string
 
 let do_compress =
   let doc = "compress files, if flag not given then $(b,$(tname)) \
@@ -85,7 +86,7 @@ let verify_params mode quality lgwin_level lgblock_level =
 let v_q = function
   | 0 -> `_0 | 1 -> `_1 | 2 -> `_2 | 3 -> `_3 | 4 -> `_4
   | 5 -> `_5 | 6 -> `_6 | 7 -> `_7 | 8 -> `_8 | 9 -> `_9
-  | _ -> assert false
+  | 10 -> `_10 | 11 -> `_11 | _ -> assert false
 
 let v_w = function
   | 10 -> `_10 | 11 -> `_11 | 12 -> `_12 | 13 -> `_13
@@ -100,7 +101,7 @@ let v_b = function
   | 24 -> `_24 | _ -> assert false
 
 let m_to_mode = function
-  | "mode" -> Compress.Generic
+  | "generic" -> Compress.Generic
   | "text" -> Compress.Text
   | "font" -> Compress.Font
   | _ -> assert false
@@ -118,12 +119,12 @@ let handle_compression
     | false ->
       (* This is the default case *)
       some_files |> Lwt_list.iter_p begin fun a_file ->
-        (a_file ^ suffix)
+        (a_file ^ "." ^ suffix)
         |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
       end
     | true ->
       some_files |> Lwt_list.iter_s begin fun a_file ->
-        (a_file ^ suffix)
+        (a_file ^ "." ^ suffix)
         |> Compress.to_path ~mode ~quality ~lgwin ~lgblock ~file_src:a_file
       end
 
@@ -137,8 +138,14 @@ let begin_program
     lgwin_level
     lgblock_level
     files =
+  (* Sanity Checks *)
+  files |> List.iter begin fun an_input ->
+    if Sys.is_directory an_input
+    then raise (Bad_input "Can't compress a directory, create an archive first");
+  end;
+  verify_params mode quality lgwin_level lgblock_level;
+  (* Good to go, spin up Lwt *)
   Lwt_main.run begin
-    verify_params mode quality lgwin_level lgblock_level;
     match do_compress with
     | true ->
       handle_compression
@@ -186,10 +193,11 @@ let top_level_info =
                  Brotli C/C++ library. Those bindings are available here: \
                  http://github.com/fxfactorial/ocaml-brotli"]
   in
-  Term.info "brozip" ~version:"0.1" ~doc ~man
+  Term.info "brozip" ~version:"1.0" ~doc ~man
 
 let () =
   match Term.eval (entry_point, top_level_info) with
   | `Ok a -> ()
-  | `Error _ -> prerr_endline "Some kind of error"
+  | `Error _ -> prerr_endline "Some kind of error, \
+                               please report to github.com/fxfactorial/issues"
   | _ -> ()
