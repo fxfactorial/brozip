@@ -36,6 +36,12 @@ let lgblock_level =
   in
   Arg.(value & opt int 10 & info ["b"; "lgblock"] ~doc)
 
+let dest_directory =
+  let doc = "What directory to output files to, defaults to \
+             this current directory"
+  in
+  Arg.(value & opt string "" & info ["d"; "directory"] ~doc)
+
 let files =
   let doc = "Input files" in
   Arg.(value & pos_all file [] & info [] ~doc )
@@ -45,6 +51,7 @@ let chorus
     quality
     no_concurrency_on
     suffix
+    dest_directory
     lgwin_level
     lgblock_level
     files =
@@ -57,6 +64,7 @@ let entry_point =
         $ quality_level
         $ no_concurrency_on
         $ suffix
+        $ dest_directory
         $ lgwin_level
         $ lgblock_level
         $ files )
