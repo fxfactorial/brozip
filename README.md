@@ -13,7 +13,17 @@ see the comparison shootout [here.](http://www.gstatic.com/b/brotlidocs/brotli-2
 
 I assume you have [opam](https://opam.ocaml.org) installed, it is OCaml's package manager.
 Until I get this up on `opam` you will have to locally pin the
-package, do that with:
+package, do that with these steps.
+
+first do: 
+
+```shell
+$ git clone https://github.com/fxfactorial/ocaml-brotli
+$ cd ocaml-brotli
+$ opam pin add brotli . -y
+```
+
+then
 
 ```shell
 $ git clone https://github.com/fxfactorial/brozip
