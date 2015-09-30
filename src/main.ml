@@ -52,8 +52,14 @@ let files =
   let doc = "Input files" in
   Arg.(value & pos_all file [] & info [] ~doc )
 
+let handle_decompression (files, no_con, suffix, dest_directory) = match no_con with
+  | false ->
+    (* This is the default case *)
+    files |> Lwt_list.iter_p Decompress.to_path
+  | true ->
+    files |> Lwt_list.iter_s Decompress.to_path
 
-let chorus
+let begin_program
     do_compress
     quality
     mode
@@ -63,12 +69,15 @@ let chorus
     lgwin_level
     lgblock_level
     files =
-
-  return ()
+  Lwt_main.run (
+  if do_compress then begin
+    return ()
+  end
+  else (handle_decompression (files, no_concurrency_on, suffix, dest_directory)))
 
 let entry_point =
   Term.(pure
-         chorus
+         begin_program
         $ do_compress
         $ quality_level
         $ mode
@@ -107,11 +116,8 @@ let top_level_info =
   in
   Term.info "brozip" ~version:"0.1" ~doc ~man
 
-let brozip =
-  (match Term.eval (entry_point, top_level_info) with
-   | `Ok a -> ()
-   | `Error e -> ()
-   | _ -> ())
-  |> return
-
-let () = Lwt_main.run brozip
+let () =
+  match Term.eval (entry_point, top_level_info) with
+  | `Ok a -> ()
+  | `Error e -> ()
+  | _ -> ()
