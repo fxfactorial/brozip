@@ -18,7 +18,7 @@ and you'll have the `brozip` executable installed.
 # brozip usage
 
 Look at the man page, always accessible with `brozip --help`
-![img](./man_page.png)
+![img](./man_page_brozip.gif)
 
 # Issues
 
