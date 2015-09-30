@@ -5,7 +5,8 @@ maintainer: "Edgar Aroutiounian <edgar.factorial@gmail.com>"
 authors: [ "Edgar Aroutiounian <edgar.factorial@gmail.com>" ]
 license: "BSD-3-clause"
 homepage: "http://hyegar.com"
-bug-reports: "http://hyegar.com"
+bug-reports: "https://github.com/fxfactorial/brozip/issues"
+dev-repo: "https://github.com/fxfactorial/brozip.git"
 build: [
   ["oasis" "setup"]
   ["ocaml" "setup.ml" "-configure" "--prefix" prefix]
