@@ -2,6 +2,8 @@ open Cmdliner
 open Lwt
 open Brotli
 
+type exn += Bad_parameter of string
+
 let do_compress =
   let doc = "compress files, if flag not given then $(b,$(tname)) \
              will decompress files "
@@ -13,7 +15,7 @@ let quality_level =
              tradeoffs. The higher the quality, the slower the \
              compression. Range is 0 to 11."
   in
-  Arg.(value & opt int 8 & info ["q"; "quality"] ~doc)
+  Arg.(value & opt int 11 & info ["q"; "quality"] ~doc)
 
 let no_concurrency_on =
   let doc = "Turn off concurrency, do work serially" in
@@ -23,11 +25,11 @@ let lgwin_level =
   let doc = "Base 2 logarithm of the sliding window size. \
              Range is 10 to 24."
   in
-  Arg.(value & opt int 16 & info ["w"; "lgwin"] ~doc)
+  Arg.(value & opt int 22 & info ["w"; "lgwin"] ~doc)
 
 let mode =
-  let doc = "Mode to use. Can be generic, text assuming UTF-8 \
-             or font assuming WOFF 2.0"
+  let doc = "Mode to use. Can be $(b,generic), $(b,text) assuming UTF-8 \
+             or $(b,font) assuming WOFF 2.0"
   in
   Arg.(value & opt string "generic" & info ["m"; "mode"] ~doc)
 
@@ -40,7 +42,7 @@ let lgblock_level =
              Range is 16 to 24. If set to 0, the value will \
              be set based on the quality. "
   in
-  Arg.(value & opt int 10 & info ["b"; "lgblock"] ~doc)
+  Arg.(value & opt int 0 & info ["b"; "lgblock"] ~doc)
 
 let dest_directory =
   let doc = "What directory to output files to, defaults to \
@@ -59,6 +61,22 @@ let handle_decompression (files, no_con, suffix, dest_directory) = match no_con 
   | true ->
     files |> Lwt_list.iter_s Decompress.to_path
 
+let verify_params mode quality lgwin_level lgblock_level =
+  (match String.lowercase mode with
+   | "generic" | "text" | "font" -> ()
+   | _ ->
+     raise (Bad_parameter "mode must be one of generic, text or font"));
+  (match quality with
+   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 -> ()
+   | _ -> raise (Bad_parameter "quality must be in 0 to 11 range"));
+  (match lgwin_level with
+   | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 -> ()
+   | _ -> raise (Bad_parameter "lgwin_level must be in 10 to 24 range"));
+  (match lgblock_level with
+   | 0 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 -> ()
+   | _ -> raise (Bad_parameter "lgblock_level must be either 0 or \
+                                a value in 16 to 24 range "))
+
 let begin_program
     do_compress
     quality
@@ -69,11 +87,13 @@ let begin_program
     lgwin_level
     lgblock_level
     files =
-  Lwt_main.run (
-  if do_compress then begin
-    return ()
+  Lwt_main.run begin
+    verify_params mode quality lgwin_level lgblock_level;
+    if do_compress then begin
+      return ()
+    end
+    else handle_decompression (files, no_concurrency_on, suffix, dest_directory)
   end
-  else (handle_decompression (files, no_concurrency_on, suffix, dest_directory)))
 
 let entry_point =
   Term.(pure
@@ -104,6 +124,8 @@ let top_level_info =
                  Each file argument must contain a separate complete \
                  archive; when multiple files are indicated, \
                  each is decompressed in turn.";
+             `P "$(b,$(tname)) exposes comression compression options but \
+                 defaults to values used by Google";
              `S "AUTHOR";
              `P "brozip was written by Edgar Aroutiounian";
              `S "BUGS";
@@ -119,5 +141,6 @@ let top_level_info =
 let () =
   match Term.eval (entry_point, top_level_info) with
   | `Ok a -> ()
-  | `Error e -> ()
+  | `Error `Exn ->
+    print_endline "was exception"
   | _ -> ()
