@@ -11,7 +11,7 @@ see the comparison shootout [here.](http://www.gstatic.com/b/brotlidocs/brotli-2
 
 # Installation
 
-(I assume you have [opam](https://opam.ocaml.org) installed, it is OCaml's package manager)
+I assume you have [opam](https://opam.ocaml.org) installed, it is OCaml's package manager.
 Until I get this up on `opam` you will have to locally pin the
 package, do that with:
 
@@ -23,9 +23,32 @@ $ opam pin add brozip . -y
 
 and you'll have the `brozip` executable installed.
 
+I tested this on `OS X` and `Debian Jessie`, both worked. It should
+work on Windows as well but you will have to put in more effort
+although it should be fine if run under `cygwin`
+
 # brozip usage
 
-Look at the man page, always accessible with `brozip --help`
+`brozip` keeps some common interfaces like other zipping utilities,
+like if no files are given, then it will just take `stdin` and process
+to `stdout` so you should be able to drop it in some shell scripts
+now.
+
+```shell
+$ brozip < asyoulik.txt.compressed | wc -l
+4122
+```
+
+The default action is decompression, tell `brozip` to compress input
+with the `--compress`, `-c` flag. 
+
+If multiple files are given then `brozip` will act on them
+concurrently, you can control this with the flag `--serial`, `-s`
+which when given will make `brozip` process files one by one.
+
+Some compression tuning options are specific to the `Brotli` algorithm
+but all default to the settings used by Google, Look at the man page
+for all details, always accessible with `brozip --help`
 ![img](./man_page_brozip.gif)
 
 # Issues
