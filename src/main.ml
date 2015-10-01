@@ -139,11 +139,17 @@ let begin_program
     lgblock_level
     files =
   (* Sanity Checks *)
+  if not (Sys.file_exists dest_directory) ||
+     (Sys.file_exists dest_directory && not (Sys.is_directory dest_directory))
+  then raise (Bad_input "Destination given either \
+                         doesn't exist or isn't a direcotry");
   files |> List.iter begin fun an_input ->
     if Sys.is_directory an_input
-    then raise (Bad_input "Can't compress a directory, create an archive first");
+    then raise (Bad_input "Can't compress a directory, \
+                           create an archive first");
   end;
   verify_params mode quality lgwin_level lgblock_level;
+
   (* Good to go, spin up Lwt *)
   Lwt_main.run begin
     match do_compress with
@@ -198,6 +204,6 @@ let top_level_info =
 let () =
   match Term.eval (entry_point, top_level_info) with
   | `Ok a -> ()
-  | `Error _ -> prerr_endline "Some kind of error, \
+  | `Error _ -> prerr_endline "If this error is unexpected then, \
                                please report to github.com/fxfactorial/issues"
   | _ -> ()
