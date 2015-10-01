@@ -8,6 +8,7 @@ let rec walk_and_action action node =
   if Sys.is_directory node
   then (Sys.readdir node
         |> Array.to_list
+        |> List.map (Filename.concat node)
         |> Lwt_list.iter_p (walk_and_action action))
   else action node
 
