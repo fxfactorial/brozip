@@ -1,5 +1,5 @@
 open Cmdliner
-open Lwt
+open Lwt.Infix
 open Brotli
 open Args
 open Utils
@@ -15,7 +15,7 @@ let rec walk_and_action action node =
 let handle_decompression
     (files, no_con, suffix, dest_directory)
     do_recurse =
-  Lwt_unix.chdir dest_directory >>= fun () -> match files with
+  Lwt_unix.chdir dest_directory <&> match files with
   | [] ->
     Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
@@ -33,7 +33,7 @@ let handle_compression
   let (mode, quality, lgwin, lgblock) =
     m_to_mode mode, v_q quality, v_w lgwin_level, v_b lgblock_level
   in
-  Lwt_unix.chdir dest_directory >>= fun () -> match files with
+  Lwt_unix.chdir dest_directory <&> match files with
   | [] ->
     Lwt_io.read Lwt_io.stdin >>= Compress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
