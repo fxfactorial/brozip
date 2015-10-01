@@ -20,8 +20,8 @@ let handle_decompression
     Lwt_io.read Lwt_io.stdin >>= Decompress.to_bytes >>= Lwt_io.write Lwt_io.stdout
   | some_files -> match no_con with
     | false ->
-      if not do_recurse then
-        some_files |> Lwt_list.iter_p Decompress.to_path
+      if not do_recurse
+      then some_files |> Lwt_list.iter_p Decompress.to_path
       else some_files |> Lwt_list.iter_p (walk_and_action Decompress.to_path)
     | true ->
       some_files |> Lwt_list.iter_s Decompress.to_path
