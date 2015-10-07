@@ -51,6 +51,6 @@ for all details, always accessible with `brozip --help`
 
 As always, please report bugs and PRs are always welcome.
 
-1.  Even though this is only `250 lines of Code, there are still places
-       that can be refactored and made more ~DRY` or just generally
+1.  Even though this is only 250 lines of Code, there are still places
+    that can be refactored and made more `DRY` or just generally
     improved.
