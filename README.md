@@ -12,30 +12,16 @@ see the comparison shootout [here.](http://www.gstatic.com/b/brotlidocs/brotli-2
 # Installation
 
 I assume you have [opam](https://opam.ocaml.org) installed, it is OCaml's package manager.
-Until I get this up on `opam` you will have to locally pin the
-package, do that with these steps.
-
-first do: 
 
 ```shell
-$ git clone https://github.com/fxfactorial/ocaml-brotli
-$ cd ocaml-brotli
-$ opam pin add brotli . -y
-```
-
-then
-
-```shell
-$ git clone https://github.com/fxfactorial/brozip
-$ cd brozip
-$ opam pin add brozip . -y
+$ opam install brozip
 ```
 
 and you'll have the `brozip` executable installed.
 
 I tested this on `OS X` and `Debian Jessie`, both worked. It should
 work on Windows as well but you will have to put in more effort
-although it should be fine if run under `cygwin`
+although it should be fine if run under `cygwin` (I think)
 
 # brozip usage
 
@@ -65,7 +51,6 @@ for all details, always accessible with `brozip --help`
 
 As always, please report bugs and PRs are always welcome.
 
-1.  Even though this is only 200 lines of Code, there are still places
-    that can be refactored and made more `DRY`
-2.  I'm leaving this for someone eager to get into open-source or
-    `OCaml`
+1.  Even though this is only `250 lines of Code, there are still places
+       that can be refactored and made more ~DRY` or just generally
+    improved.
