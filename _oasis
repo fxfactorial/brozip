@@ -11,6 +11,9 @@ License:      BSD-3-clause
 Plugins:      META (0.4), DevFiles (0.4)
 AlphaFeatures: ocamlbuild_more_args
 
+PostBuildCommand:
+  sh install_man.sh
+
 Description:
   brozip is a command line tool to compress and decompress
   files using the Brotli algorithm and OCaml bindings to the
