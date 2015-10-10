@@ -44,7 +44,7 @@ which when given will make `brozip` process files one by one.
 
 Some compression tuning options are specific to the `Brotli` algorithm
 but all default to the settings used by Google, Look at the man page
-for all details, always accessible with `brozip --help`
+for all details, accessible with either `man brozip` or `brozip --help`
 ![img](./man_page_brozip.gif)
 
 # Issues
