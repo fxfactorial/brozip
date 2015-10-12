@@ -23,6 +23,11 @@ I tested this on `OS X` and `Debian Jessie`, both worked. It should
 work on Windows as well but you will have to put in more effort
 although it should be fine if run under `cygwin` (I think)
 
+**NOTE** You might get a shared library error on Linux, like on
+Debian. This is most likely an issue with where your system looks for
+shared libraries. Do the following, edit your `/etc/ld.so.conf` and
+add `/usr/local/lib`, then as `root` run `ldconfig`.
+
 # brozip usage
 
 `brozip` keeps some common interfaces like other zipping utilities,
@@ -45,6 +50,7 @@ which when given will make `brozip` process files one by one.
 Some compression tuning options are specific to the `Brotli` algorithm
 but all default to the settings used by Google, Look at the man page
 for all details, accessible with either `man brozip` or `brozip --help`
+
 ![img](./man_page_brozip.gif)
 
 # Issues
