@@ -1,5 +1,5 @@
 `brozip` is a **fast** command line tool to concurrently compress,
-decompress files using the Brotli compression algorithm. If can handle
+decompress files using the Brotli compression algorithm. It can handle
 arbitrary number of files given and if none are given it will perform
 an operation on `stdin` and push the results to `stdout`
 
