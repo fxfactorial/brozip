@@ -1,0 +1,28 @@
+opam-version: "2.0"
+maintainer: "Edgar Aroutiounian <edgar.factorial@gmail.com>"
+authors: "Edgar Aroutiounian <edgar.factorial@gmail.com>"
+homepage: "http://hyegar.com"
+bug-reports: "https://github.com/fxfactorial/brozip/issues"
+license: "BSD-3-Clause"
+dev-repo: "git+https://github.com/fxfactorial/brozip.git"
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs
+    "@install"
+    "@runtest" {with-test}
+    "@doc" {with-doc}]
+]
+depends: [
+  "ocaml" {>= "4.02.3"}
+  "brotli" {build}
+  "cmdliner" {build}
+  "lwt" {build}
+  "dune"
+]
+synopsis:
+  "CLI to concurrently compress, decompress files using the Brotli algorithm"
+description: """
+brozip is a command line tool to compress and decompress files using
+the Brotli algorithm, it uses OCaml bindings to the Google Brotli
+library. Ideally this should be used for compressing JSON over HTTP
+requests."""

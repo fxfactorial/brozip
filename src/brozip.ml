@@ -13,7 +13,7 @@ let rec walk_and_action action node =
   else action node
 
 let handle_decompression
-    (files, no_con, suffix, dest_directory)
+    (files, no_con, _, dest_directory)
     do_recurse =
   Lwt_unix.chdir dest_directory <&> match files with
   | [] ->
@@ -29,7 +29,7 @@ let handle_decompression
 let handle_compression
     (files, no_con, suffix, dest_directory)
     (mode, quality, lgwin_level, lgblock_level)
-    do_recurse =
+    _ =
   let (mode, quality, lgwin, lgblock) =
     m_to_mode mode, v_q quality, v_w lgwin_level, v_b lgblock_level
   in
@@ -128,7 +128,7 @@ let top_level_info =
 
 let () =
   match Term.eval (entry_point, top_level_info) with
-  | `Ok a -> ()
+  | `Ok _ -> ()
   | `Error _ -> prerr_endline "If this error is unexpected then, \
                                please report to github.com/fxfactorial/issues"
   | _ -> ()
