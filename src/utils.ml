@@ -5,7 +5,7 @@ type exn += Bad_input of string
 let ( ^.^ ) l r = l ^ "." ^ r
 
 let verify_params mode quality lgwin_level lgblock_level =
-  (match String.lowercase mode with
+  (match String.lowercase_ascii mode with
    | "generic" | "text" | "font" -> ()
    | _ ->
      raise (Bad_parameter "mode must be one of generic, text or font"));

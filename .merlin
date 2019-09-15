@@ -1,2 +1,0 @@
-B _build/src
-PKG cmdliner brotli lwt lwt.ppx
